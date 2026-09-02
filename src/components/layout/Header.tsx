@@ -14,11 +14,14 @@ import {
   ChevronDown
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useCart } from "@/contexts/CartContext";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const location = useLocation();
+  const { cartItems } = useCart();
+  const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
   const navLinks = [
     { href: "/", label: "Home" },
@@ -107,9 +110,11 @@ const Header = () => {
             <Link to="/cart" className="active:scale-95 transition-transform">
               <Button variant="ghost" size="icon" className="relative h-9 w-9 sm:h-10 sm:w-10">
                 <ShoppingCart className="h-4 w-4 sm:h-5 sm:w-5" />
-                <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-primary text-primary-foreground text-xs flex items-center justify-center font-bold">
-                  0
-                </span>
+                {cartCount > 0 && (
+                  <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-brand-orange text-white text-xs flex items-center justify-center font-bold">
+                    {cartCount > 99 ? "99+" : cartCount}
+                  </span>
+                )}
               </Button>
             </Link>
             

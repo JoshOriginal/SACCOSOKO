@@ -2,7 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { ThemeContext, ThemeColor, ThemeContextType } from './themeContextType';
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [color, setColorState] = useState<ThemeColor>('orange');
+  // SACCO-SOKO's brand identity is Green (primary) + Blue (secondary) + White,
+  // so that's the default theme. The "orange"/"blue"/"purple" presets below
+  // remain available from Admin Settings > Appearance as optional overrides.
+  const [color, setColorState] = useState<ThemeColor>('green');
   const [darkMode, setDarkModeState] = useState(false);
 
   // Load theme from localStorage on mount

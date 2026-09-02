@@ -1,13 +1,10 @@
 import React, { useState, useEffect, ReactNode } from 'react';
+import { CartItem } from '@/types';
 
-export interface CartItem {
-  id: number;
-  name: string;
-  price: number;
-  image: string;
-  seller: string;
-  quantity: number;
-}
+// Re-exported for backward compatibility with existing imports of
+// `CartItem` from this file — the canonical definition now lives in
+// src/types/cart.ts.
+export type { CartItem };
 
 interface CartContextType {
   cartItems: CartItem[];

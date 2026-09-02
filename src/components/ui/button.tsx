@@ -29,6 +29,10 @@ const buttonVariants = cva(
           "border-2 border-primary-foreground/30 bg-primary-foreground/10 text-primary-foreground backdrop-blur-sm hover:bg-primary-foreground/20 hover:border-primary-foreground/50",
         "add-to-cart":
           "bg-primary text-primary-foreground hover:bg-primary/90 shadow-md font-bold uppercase tracking-wide",
+        // Sparingly-used accent for high-priority CTAs (e.g. limited-time
+        // offers, urgent actions) — not the default button color.
+        accent:
+          "bg-brand-orange text-white hover:bg-brand-orange/90 shadow-md hover:shadow-lg active:scale-[0.98] font-bold",
       },
       size: {
         default: "h-10 px-5 py-2",

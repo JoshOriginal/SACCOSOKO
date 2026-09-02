@@ -1,0 +1,280 @@
+/**
+ * DEMO / MOCK DATA — the single canonical product list for the prototype.
+ *
+ * Previously the Shop, ShopAll, Home (Featured Products) and Product Detail
+ * pages each defined their own separate, inconsistent product arrays. This
+ * file replaces all of them so every page shows the same products with the
+ * same ids, prices and sellers.
+ */
+import { Product } from "@/types";
+
+export const products: Product[] = [
+  {
+    id: 1,
+    name: "Samsung Galaxy A54 5G - 128GB, 8GB RAM",
+    category: "electronics",
+    price: 45999,
+    originalPrice: 52999,
+    images: [
+      "https://images.unsplash.com/photo-1610945415295-d9bbf067e59c?w=600&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=600&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1565849904461-04a58ad377e0?w=600&h=600&fit=crop",
+    ],
+    sellerId: "tech-hub-kenya",
+    rating: 4.8,
+    reviews: 124,
+    stock: 15,
+    badge: "Best Seller",
+    featured: true,
+    description: `The Samsung Galaxy A54 5G delivers a premium smartphone experience with its stunning 6.4" Super AMOLED display, powerful Exynos 1380 processor, and versatile camera system.
+
+Key Features:
+• 6.4" Super AMOLED Display with 120Hz refresh rate
+• Triple camera system: 50MP main + 12MP ultra-wide + 5MP macro
+• 32MP front camera for stunning selfies
+• 5000mAh battery with 25W fast charging
+• IP67 water and dust resistance
+• 5G connectivity for blazing-fast speeds`,
+    specs: [
+      { label: "Display", value: '6.4" Super AMOLED, 120Hz' },
+      { label: "Processor", value: "Exynos 1380 Octa-core" },
+      { label: "RAM", value: "8GB" },
+      { label: "Storage", value: "128GB" },
+      { label: "Battery", value: "5000mAh" },
+      { label: "Camera", value: "50MP + 12MP + 5MP" },
+    ],
+  },
+  {
+    id: 2,
+    name: "Nike Air Max 270 Sneakers",
+    category: "fashion",
+    price: 12500,
+    originalPrice: 15000,
+    images: ["https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600&h=600&fit=crop"],
+    sellerId: "footwear-king",
+    rating: 4.6,
+    reviews: 89,
+    stock: 22,
+    badge: "Hot Deal",
+    featured: true,
+    description: "Iconic Nike Air Max 270 sneakers featuring a large heel Air unit for all-day comfort and a bold, street-ready look. Breathable mesh upper keeps your feet cool during long walks around town.",
+    specs: [
+      { label: "Sizes", value: "UK 6 - UK 11" },
+      { label: "Upper Material", value: "Mesh & synthetic overlay" },
+      { label: "Sole", value: "Rubber, Air Max cushioning" },
+    ],
+  },
+  {
+    id: 3,
+    name: "Wireless Bluetooth Headphones",
+    category: "electronics",
+    price: 3999,
+    originalPrice: 5500,
+    images: ["https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600&h=600&fit=crop"],
+    sellerId: "audio-world",
+    rating: 4.5,
+    reviews: 256,
+    stock: 40,
+    badge: null,
+    featured: true,
+    description: "Over-ear wireless Bluetooth headphones with deep bass, up to 20 hours of playback, and a foldable design that's easy to carry around.",
+    specs: [
+      { label: "Battery Life", value: "20 hours" },
+      { label: "Connectivity", value: "Bluetooth 5.0" },
+      { label: "Weight", value: "180g" },
+    ],
+  },
+  {
+    id: 4,
+    name: "Women's Elegant Watch",
+    category: "fashion",
+    price: 8999,
+    originalPrice: 12000,
+    images: ["https://images.unsplash.com/photo-1524592094714-0f0654e20314?w=600&h=600&fit=crop"],
+    sellerId: "time-gallery",
+    rating: 4.7,
+    reviews: 67,
+    stock: 12,
+    badge: "New",
+    featured: true,
+    description: "A timeless stainless-steel women's watch with a minimalist dial — equally at home in the office or at an evening event.",
+    specs: [
+      { label: "Case Material", value: "Stainless steel" },
+      { label: "Water Resistance", value: "3 ATM" },
+      { label: "Strap", value: "Leather" },
+    ],
+  },
+  {
+    id: 5,
+    name: "Leather Laptop Bag",
+    category: "fashion",
+    price: 6500,
+    originalPrice: 8500,
+    images: ["https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=600&h=600&fit=crop"],
+    sellerId: "bags-and-more",
+    rating: 4.4,
+    reviews: 45,
+    stock: 18,
+    badge: null,
+    featured: true,
+    description: "Genuine leather laptop bag with padded compartments that fit laptops up to 15.6 inches, plus organized pockets for accessories.",
+    specs: [
+      { label: "Fits", value: 'Up to 15.6" laptop' },
+      { label: "Material", value: "Genuine leather" },
+      { label: "Compartments", value: "3" },
+    ],
+  },
+  {
+    id: 6,
+    name: "Smart Fitness Tracker",
+    category: "electronics",
+    price: 4500,
+    originalPrice: 6000,
+    images: ["https://images.unsplash.com/photo-1575311373937-040b8e1fd5b6?w=600&h=600&fit=crop"],
+    sellerId: "fittech",
+    rating: 4.3,
+    reviews: 178,
+    stock: 25,
+    badge: "Popular",
+    featured: true,
+    description: "Track steps, heart rate, sleep and workouts with this lightweight, water-resistant smart fitness band.",
+    specs: [
+      { label: "Battery Life", value: "7 days" },
+      { label: "Water Resistance", value: "IP68" },
+      { label: "Display", value: "AMOLED touchscreen" },
+    ],
+  },
+  {
+    id: 7,
+    name: "Portable Power Bank 20000mAh",
+    category: "electronics",
+    price: 2999,
+    originalPrice: 3999,
+    images: ["https://images.unsplash.com/photo-1609091839311-d5365f9ff1c5?w=600&h=600&fit=crop"],
+    sellerId: "powerup",
+    rating: 4.6,
+    reviews: 312,
+    stock: 60,
+    badge: null,
+    featured: true,
+    description: "High-capacity 20000mAh power bank with dual USB output and fast charging — enough to charge a smartphone up to 5 times.",
+    specs: [
+      { label: "Capacity", value: "20000mAh" },
+      { label: "Output", value: "Dual USB, 2.1A" },
+      { label: "Charging Time", value: "~6 hours" },
+    ],
+  },
+  {
+    id: 8,
+    name: "Casual Cotton T-Shirt",
+    category: "fashion",
+    price: 1500,
+    originalPrice: 2000,
+    images: ["https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=600&h=600&fit=crop"],
+    sellerId: "fashion-hub",
+    rating: 4.2,
+    reviews: 89,
+    stock: 80,
+    badge: null,
+    featured: true,
+    description: "Soft, breathable 100% cotton t-shirt with a relaxed fit — a wardrobe essential for everyday wear.",
+    specs: [
+      { label: "Material", value: "100% cotton" },
+      { label: "Fit", value: "Regular" },
+      { label: "Care", value: "Machine washable" },
+    ],
+  },
+  {
+    id: 9,
+    name: "Running Shoes Pro",
+    category: "sports",
+    price: 9500,
+    originalPrice: 12500,
+    images: ["https://images.unsplash.com/photo-1460353581641-37baddab0fa2?w=600&h=600&fit=crop"],
+    sellerId: "sports-direct",
+    rating: 4.7,
+    reviews: 156,
+    stock: 30,
+    badge: null,
+    featured: false,
+    description: "Lightweight running shoes engineered for cushioning and grip on long runs, with breathable knit fabric.",
+    specs: [
+      { label: "Sole", value: "EVA cushioned" },
+      { label: "Upper", value: "Breathable knit" },
+      { label: "Use", value: "Road running" },
+    ],
+  },
+  {
+    id: 10,
+    name: "Yoga Mat Premium",
+    category: "sports",
+    price: 2500,
+    originalPrice: 3500,
+    images: ["https://images.unsplash.com/photo-1601925260368-ae2f83cf8b7f?w=600&h=600&fit=crop"],
+    sellerId: "fitlife",
+    rating: 4.4,
+    reviews: 78,
+    stock: 45,
+    badge: null,
+    featured: false,
+    description: "Extra-thick, non-slip yoga mat with excellent cushioning for joints. Includes a carry strap.",
+    specs: [
+      { label: "Thickness", value: "6mm" },
+      { label: "Material", value: "NBR foam" },
+      { label: "Includes", value: "Carry strap" },
+    ],
+  },
+  {
+    id: 11,
+    name: "Baby Stroller Lightweight",
+    category: "baby",
+    price: 15000,
+    originalPrice: 20000,
+    images: ["https://images.unsplash.com/photo-1591088398332-8a7791972843?w=600&h=600&fit=crop"],
+    sellerId: "baby-world",
+    rating: 4.8,
+    reviews: 45,
+    stock: 10,
+    badge: null,
+    featured: false,
+    description: "Compact, lightweight stroller with a one-hand fold, reclining seat and sun canopy — built for busy parents on the move.",
+    specs: [
+      { label: "Weight", value: "6.5kg" },
+      { label: "Fold", value: "One-hand compact fold" },
+      { label: "Recline", value: "Multi-position" },
+    ],
+  },
+  {
+    id: 12,
+    name: "Makeup Brush Set",
+    category: "beauty",
+    price: 1999,
+    originalPrice: 2999,
+    images: ["https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=600&h=600&fit=crop"],
+    sellerId: "beauty-zone",
+    rating: 4.5,
+    reviews: 234,
+    stock: 50,
+    badge: null,
+    featured: false,
+    description: "12-piece professional makeup brush set with soft synthetic bristles, ideal for both powder and cream products.",
+    specs: [
+      { label: "Pieces", value: "12" },
+      { label: "Bristles", value: "Synthetic, cruelty-free" },
+      { label: "Includes", value: "Travel pouch" },
+    ],
+  },
+];
+
+export function getProductById(id: number | string): Product | undefined {
+  const numericId = typeof id === "string" ? Number(id) : id;
+  return products.find((p) => p.id === numericId);
+}
+
+export function getFeaturedProducts(): Product[] {
+  return products.filter((p) => p.featured);
+}
+
+export function getRelatedProducts(product: Product, limit = 4): Product[] {
+  return products.filter((p) => p.id !== product.id && p.category === product.category).slice(0, limit);
+}

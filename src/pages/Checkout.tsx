@@ -1,10 +1,12 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import { useToast } from "@/components/ui/use-toast";
+import { useCart } from "@/contexts/CartContext";
 import {
   Card,
   CardContent,
@@ -23,18 +25,52 @@ import {
   Truck,
   CheckCircle2,
   ArrowRight,
+  Info,
 } from "lucide-react";
+import { Order, OrderItem, PaymentMethod } from "@/types";
+import { buildTimeline } from "@/data/orders";
+
+const DELIVERY_FEE = 200;
+const TAX_RATE = 0.15;
+
+interface DeliveryFormState {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  address: string;
+  city: string;
+  zipcode: string;
+}
+
+const emptyForm: DeliveryFormState = {
+  firstName: "",
+  lastName: "",
+  email: "",
+  phone: "",
+  address: "",
+  city: "",
+  zipcode: "",
+};
 
 const Checkout = () => {
   const navigate = useNavigate();
-  const [paymentMethod, setPaymentMethod] = useState("mpesa");
+  const { toast } = useToast();
+  const { cartItems, getCartTotal, clearCart } = useCart();
+  const [formData, setFormData] = useState<DeliveryFormState>(emptyForm);
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("mpesa");
   const [isProcessing, setIsProcessing] = useState(false);
   const [orderComplete, setOrderComplete] = useState(false);
+  const [placedOrder, setPlacedOrder] = useState<Order | null>(null);
 
-  const cartItems = [
-    { id: 1, name: "Samsung Galaxy A54 5G", price: 45999, quantity: 1 },
-    { id: 2, name: "Nike Air Max 270 Sneakers", price: 12500, quantity: 2 },
-  ];
+  // If the cart is empty (and we're not just showing a completed order's
+  // confirmation screen), there's nothing to check out — send the customer
+  // back to their cart instead of showing fake products.
+  useEffect(() => {
+    if (cartItems.length === 0 && !orderComplete) {
+      navigate("/cart", { replace: true });
+    }
+  }, [cartItems, orderComplete, navigate]);
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("en-KE", {
@@ -44,23 +80,68 @@ const Checkout = () => {
     }).format(price);
   };
 
-  const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  const deliveryFee = 250;
-  const tax = Math.round(subtotal * 0.15);
-  const total = subtotal + deliveryFee + tax;
+  const subtotal = getCartTotal();
+  const tax = Math.round(subtotal * TAX_RATE);
+  const total = subtotal + DELIVERY_FEE + tax;
 
-  const handleSubmitOrder = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsProcessing(true);
-
-    // Simulate payment processing
-    setTimeout(() => {
-      setIsProcessing(false);
-      setOrderComplete(true);
-    }, 2000);
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { id, value } = e.target;
+    setFormData((prev) => ({ ...prev, [id]: value }));
   };
 
-  if (orderComplete) {
+  const handleSubmitOrder = () => {
+    const required: (keyof DeliveryFormState)[] = ["firstName", "lastName", "email", "phone", "address", "city"];
+    const missing = required.some((field) => !formData[field].trim());
+    if (missing) {
+      toast({
+        title: "Missing delivery details",
+        description: "Please fill in all required fields before placing your order.",
+      });
+      return;
+    }
+
+    setIsProcessing(true);
+
+    const orderItems: OrderItem[] = cartItems.map((item) => ({
+      productId: item.id,
+      name: item.name,
+      image: item.image,
+      seller: item.seller,
+      quantity: item.quantity,
+      price: item.price,
+    }));
+
+    const orderId = `SKO-${new Date().getFullYear()}-${Math.floor(100000 + Math.random() * 900000)}`;
+    const createdAt = new Date();
+
+    const newOrder: Order = {
+      id: orderId,
+      customerName: `${formData.firstName} ${formData.lastName}`.trim(),
+      email: formData.email,
+      phone: formData.phone,
+      deliveryAddress: `${formData.address}, ${formData.city}${formData.zipcode ? ` ${formData.zipcode}` : ""}`,
+      items: orderItems,
+      subtotal,
+      deliveryFee: DELIVERY_FEE,
+      tax,
+      total,
+      paymentMethod,
+      status: "pending",
+      createdAt: createdAt.toISOString(),
+      timeline: buildTimeline("pending", createdAt),
+    };
+
+    // Simulated processing delay — this is a demo checkout. No payment
+    // gateway is called and the order is not persisted to a database yet.
+    setTimeout(() => {
+      setIsProcessing(false);
+      setPlacedOrder(newOrder);
+      setOrderComplete(true);
+      clearCart();
+    }, 1500);
+  };
+
+  if (orderComplete && placedOrder) {
     return (
       <Layout>
         <div className="min-h-screen bg-muted/30 flex items-center justify-center py-12 px-4">
@@ -73,16 +154,16 @@ const Checkout = () => {
               </div>
               <h1 className="text-2xl font-bold text-foreground mb-2">Order Confirmed!</h1>
               <p className="text-muted-foreground mb-6">
-                Your order has been placed successfully. You'll receive a confirmation email shortly.
+                Your order has been placed successfully.
               </p>
               <div className="space-y-3 mb-8 p-4 bg-muted rounded-lg">
                 <div className="flex justify-between">
                   <span className="text-sm text-foreground">Order ID:</span>
-                  <span className="text-sm font-semibold text-foreground">#SMK-2024-789456</span>
+                  <span className="text-sm font-semibold text-foreground">{placedOrder.id}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-sm text-foreground">Total Amount:</span>
-                  <span className="text-sm font-semibold text-primary">{formatPrice(total)}</span>
+                  <span className="text-sm font-semibold text-primary">{formatPrice(placedOrder.total)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-sm text-foreground">Delivery Date:</span>
@@ -91,7 +172,7 @@ const Checkout = () => {
               </div>
               <div className="space-y-3">
                 <Button
-                  onClick={() => navigate("/track-order")}
+                  onClick={() => navigate("/track-order", { state: { order: placedOrder } })}
                   className="w-full"
                 >
                   Track Your Order
@@ -110,6 +191,11 @@ const Checkout = () => {
         </div>
       </Layout>
     );
+  }
+
+  if (cartItems.length === 0) {
+    // Brief window before the redirect effect above kicks in.
+    return null;
   }
 
   return (
@@ -133,33 +219,33 @@ const Checkout = () => {
                   <div className="grid sm:grid-cols-2 gap-4">
                     <div>
                       <Label htmlFor="firstName">First Name</Label>
-                      <Input id="firstName" placeholder="John" className="mt-2" />
+                      <Input id="firstName" placeholder="John" className="mt-2" value={formData.firstName} onChange={handleChange} required />
                     </div>
                     <div>
                       <Label htmlFor="lastName">Last Name</Label>
-                      <Input id="lastName" placeholder="Doe" className="mt-2" />
+                      <Input id="lastName" placeholder="Doe" className="mt-2" value={formData.lastName} onChange={handleChange} required />
                     </div>
                   </div>
                   <div>
                     <Label htmlFor="email">Email Address</Label>
-                    <Input id="email" type="email" placeholder="john@example.com" className="mt-2" />
+                    <Input id="email" type="email" placeholder="john@example.com" className="mt-2" value={formData.email} onChange={handleChange} required />
                   </div>
                   <div>
                     <Label htmlFor="phone">Phone Number</Label>
-                    <Input id="phone" type="tel" placeholder="+254 712 345 678" className="mt-2" />
+                    <Input id="phone" type="tel" placeholder="+254 712 345 678" className="mt-2" value={formData.phone} onChange={handleChange} required />
                   </div>
                   <div>
                     <Label htmlFor="address">Delivery Address</Label>
-                    <Input id="address" placeholder="Street address" className="mt-2" />
+                    <Input id="address" placeholder="Street address" className="mt-2" value={formData.address} onChange={handleChange} required />
                   </div>
                   <div className="grid sm:grid-cols-2 gap-4">
                     <div>
                       <Label htmlFor="city">City</Label>
-                      <Input id="city" placeholder="Nairobi" className="mt-2" />
+                      <Input id="city" placeholder="Nairobi" className="mt-2" value={formData.city} onChange={handleChange} required />
                     </div>
                     <div>
                       <Label htmlFor="zipcode">Postal Code</Label>
-                      <Input id="zipcode" placeholder="00100" className="mt-2" />
+                      <Input id="zipcode" placeholder="00100" className="mt-2" value={formData.zipcode} onChange={handleChange} />
                     </div>
                   </div>
                 </CardContent>
@@ -174,7 +260,7 @@ const Checkout = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <Tabs value={paymentMethod} onValueChange={setPaymentMethod}>
+                  <Tabs value={paymentMethod} onValueChange={(value) => setPaymentMethod(value as PaymentMethod)}>
                     <TabsList className="grid w-full grid-cols-3">
                       <TabsTrigger value="mpesa" className="flex items-center gap-2">
                         <Smartphone className="h-4 w-4" />
@@ -227,6 +313,12 @@ const Checkout = () => {
                       </div>
                     </TabsContent>
                   </Tabs>
+                  <div className="flex items-start gap-2 mt-4 p-3 rounded-lg bg-brand-light-orange border border-brand-orange/20">
+                    <Info className="h-4 w-4 text-brand-orange shrink-0 mt-0.5" />
+                    <p className="text-xs text-muted-foreground">
+                      Demo checkout — no real payment is processed and no charge will be made.
+                    </p>
+                  </div>
                 </CardContent>
               </Card>
             </div>
@@ -234,15 +326,26 @@ const Checkout = () => {
             {/* Order Summary */}
             <Card className="h-fit sticky top-24">
               <CardHeader>
-                <CardTitle>Order Summary</CardTitle>
+                <CardTitle>Order Summary ({cartItems.length} {cartItems.length === 1 ? "item" : "items"})</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 {cartItems.map((item) => (
-                  <div key={item.id} className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">
-                      {item.name} <Badge variant="outline" className="ml-2">{item.quantity}x</Badge>
-                    </span>
-                    <span className="font-semibold text-foreground">{formatPrice(item.price * item.quantity)}</span>
+                  <div key={item.id} className="flex gap-3 pb-3 border-b border-border last:border-0 last:pb-0">
+                    <img
+                      src={item.image}
+                      alt={item.name}
+                      className="h-14 w-14 rounded-md object-cover shrink-0 bg-muted"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-foreground truncate">{item.name}</p>
+                      <p className="text-xs text-muted-foreground">{item.seller}</p>
+                      <div className="flex items-center justify-between mt-1">
+                        <span className="text-xs text-muted-foreground">
+                          {formatPrice(item.price)} <Badge variant="outline" className="ml-1">{item.quantity}x</Badge>
+                        </span>
+                        <span className="text-sm font-semibold text-foreground">{formatPrice(item.price * item.quantity)}</span>
+                      </div>
+                    </div>
                   </div>
                 ))}
 
@@ -252,8 +355,8 @@ const Checkout = () => {
                     <span className="text-foreground">{formatPrice(subtotal)}</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Delivery Fee</span>
-                    <span className="text-foreground">{formatPrice(deliveryFee)}</span>
+                    <span className="text-muted-foreground">Delivery Fee (SACCO-SOKO)</span>
+                    <span className="text-foreground">{formatPrice(DELIVERY_FEE)}</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Tax (15%)</span>

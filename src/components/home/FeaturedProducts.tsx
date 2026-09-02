@@ -4,97 +4,20 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/components/ui/use-toast";
 import { useCart } from "@/contexts/CartContext";
 import { Heart, ShoppingCart, Star, ChevronRight } from "lucide-react";
+import { getFeaturedProducts } from "@/data/products";
+import { getSellerById } from "@/data/sellers";
 
-const products = [
-  {
-    id: 1,
-    name: "Samsung Galaxy A54 5G",
-    price: 45999,
-    originalPrice: 52999,
-    image: "https://images.unsplash.com/photo-1610945415295-d9bbf067e59c?w=400&h=400&fit=crop",
-    seller: "Tech Hub Kenya",
-    rating: 4.8,
-    reviews: 124,
-    badge: "Best Seller",
-  },
-  {
-    id: 2,
-    name: "Nike Air Max 270 Sneakers",
-    price: 12500,
-    originalPrice: 15000,
-    image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=400&fit=crop",
-    seller: "Footwear King",
-    rating: 4.6,
-    reviews: 89,
-    badge: "Hot Deal",
-  },
-  {
-    id: 3,
-    name: "Wireless Bluetooth Headphones",
-    price: 3999,
-    originalPrice: 5500,
-    image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=400&fit=crop",
-    seller: "Audio World",
-    rating: 4.5,
-    reviews: 256,
-    badge: null,
-  },
-  {
-    id: 4,
-    name: "Women's Elegant Watch",
-    price: 8999,
-    originalPrice: 12000,
-    image: "https://images.unsplash.com/photo-1524592094714-0f0654e20314?w=400&h=400&fit=crop",
-    seller: "Time Gallery",
-    rating: 4.7,
-    reviews: 67,
-    badge: "New",
-  },
-  {
-    id: 5,
-    name: "Leather Laptop Bag",
-    price: 6500,
-    originalPrice: 8500,
-    image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400&h=400&fit=crop",
-    seller: "Bags & More",
-    rating: 4.4,
-    reviews: 45,
-    badge: null,
-  },
-  {
-    id: 6,
-    name: "Smart Fitness Tracker",
-    price: 4500,
-    originalPrice: 6000,
-    image: "https://images.unsplash.com/photo-1575311373937-040b8e1fd5b6?w=400&h=400&fit=crop",
-    seller: "FitTech",
-    rating: 4.3,
-    reviews: 178,
-    badge: "Popular",
-  },
-  {
-    id: 7,
-    name: "Portable Power Bank 20000mAh",
-    price: 2999,
-    originalPrice: 3999,
-    image: "https://images.unsplash.com/photo-1609091839311-d5365f9ff1c5?w=400&h=400&fit=crop",
-    seller: "PowerUp",
-    rating: 4.6,
-    reviews: 312,
-    badge: null,
-  },
-  {
-    id: 8,
-    name: "Casual Cotton T-Shirt",
-    price: 1500,
-    originalPrice: 2000,
-    image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&h=400&fit=crop",
-    seller: "Fashion Hub",
-    rating: 4.2,
-    reviews: 89,
-    badge: null,
-  },
-];
+const products = getFeaturedProducts().map((p) => ({
+  id: p.id,
+  name: p.name,
+  price: p.price,
+  originalPrice: p.originalPrice,
+  image: p.images[0],
+  seller: getSellerById(p.sellerId)?.businessName ?? "SACCO-SOKO Seller",
+  rating: p.rating,
+  reviews: p.reviews,
+  badge: p.badge ?? null,
+}));
 
 const FeaturedProducts = () => {
   const { toast } = useToast();
@@ -112,7 +35,7 @@ const FeaturedProducts = () => {
     return Math.round(((original - current) / original) * 100);
   };
 
-  const handleAddToCart = (product: any) => {
+  const handleAddToCart = (product: (typeof products)[number]) => {
     addToCart({
       id: product.id,
       name: product.name,
@@ -161,9 +84,7 @@ const FeaturedProducts = () => {
                 
                 {/* Badges */}
                 {product.badge && (
-                  <Badge 
-                    className="absolute top-3 left-3 bg-primary text-primary-foreground font-semibold"
-                  >
+                  <Badge variant="accent" className="absolute top-3 left-3 font-semibold">
                     {product.badge}
                   </Badge>
                 )}

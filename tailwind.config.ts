@@ -73,12 +73,16 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
-        // SACCO-SOKO custom colors
-        metro: {
-          green: "hsl(var(--SACCO-SOKO-orange))",
-          blue: "hsl(var(--SACCO-SOKO-blue))",
-          "light-green": "hsl(var(--SACCO-SOKO-light-orange))",
-          "light-blue": "hsl(var(--SACCO-SOKO-light-blue))",
+        // SACCO-SOKO brand colors — Green + Blue + Orange (accent).
+        // Matches the `bg-brand-*` / `text-brand-*` utility classes used
+        // throughout the app (e.g. bg-brand-light-blue, text-brand-orange).
+        brand: {
+          green: "hsl(var(--brand-green))",
+          "light-green": "hsl(var(--brand-green-light))",
+          blue: "hsl(var(--brand-blue))",
+          "light-blue": "hsl(var(--brand-blue-light))",
+          orange: "hsl(var(--brand-orange))",
+          "light-orange": "hsl(var(--brand-orange-light))",
         },
       },
       borderRadius: {

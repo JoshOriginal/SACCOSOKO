@@ -19,7 +19,6 @@ import SellOnSokoSacco from "./pages/SellOnSokoSacco";
 import AboutUs from "./pages/AboutUs";
 import ReturnsRefunds from "./pages/ReturnsRefunds";
 import ShippingInfo from "./pages/ShippingInfo";
-import TrackOrderPage from "./pages/TrackOrderPage";
 import FAQs from "./pages/FAQs";
 import ContactUs from "./pages/ContactUs";
 import AdminDashboard from "./pages/AdminDashboard";
@@ -58,7 +57,6 @@ const App = () => (
             <Route path="/cart" element={<Cart />} />
             <Route path="/checkout" element={<Checkout />} />
             <Route path="/track-order" element={<TrackOrder />} />
-            <Route path="/track-order-page" element={<TrackOrderPage />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/product/:id" element={<ProductDetail />} />
             <Route path="/seller/register" element={<SellerRegister />} />

@@ -68,7 +68,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const location = useLocation();
   const navigate = useNavigate();
-  const { logout, adminUsername } = useAuth();
+  const { logout, userEmail } = useAuth();
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -128,7 +128,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         <div className="p-4 border-t border-gray-800 space-y-2">
           {sidebarOpen && (
             <div className="p-3 bg-gray-800 rounded-lg">
-              <p className="text-sm font-medium text-white">{adminUsername}</p>
+              <p className="text-sm font-medium text-white truncate">{userEmail ?? "Admin"}</p>
               <p className="text-xs text-gray-400">Administrator</p>
             </div>
           )}

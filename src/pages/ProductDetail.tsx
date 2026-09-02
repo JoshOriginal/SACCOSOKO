@@ -5,57 +5,21 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/components/ui/use-toast";
 import { useCart } from "@/contexts/CartContext";
-import { 
-  Star, 
-  Heart, 
-  ShoppingCart, 
-  Minus, 
-  Plus, 
-  Truck, 
-  Shield, 
+import { getProductById, getRelatedProducts } from "@/data/products";
+import { getSellerById } from "@/data/sellers";
+import {
+  Star,
+  Heart,
+  ShoppingCart,
+  Minus,
+  Plus,
+  Truck,
+  Shield,
   MapPin,
   Store,
-  ChevronRight
+  ChevronRight,
+  PackageSearch,
 } from "lucide-react";
-
-const product = {
-  id: 1,
-  name: "Samsung Galaxy A54 5G - 128GB, 8GB RAM",
-  price: 45999,
-  originalPrice: 52999,
-  images: [
-    "https://images.unsplash.com/photo-1610945415295-d9bbf067e59c?w=600&h=600&fit=crop",
-    "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=600&h=600&fit=crop",
-    "https://images.unsplash.com/photo-1565849904461-04a58ad377e0?w=600&h=600&fit=crop",
-  ],
-  seller: {
-    name: "Tech Hub Kenya",
-    rating: 4.8,
-    products: 156,
-    joined: "2022",
-  },
-  rating: 4.8,
-  reviews: 124,
-  stock: 15,
-  description: `The Samsung Galaxy A54 5G delivers a premium smartphone experience with its stunning 6.4" Super AMOLED display, powerful Exynos 1380 processor, and versatile camera system.
-
-Key Features:
-• 6.4" Super AMOLED Display with 120Hz refresh rate
-• Triple camera system: 50MP main + 12MP ultra-wide + 5MP macro
-• 32MP front camera for stunning selfies
-• 5000mAh battery with 25W fast charging
-• IP67 water and dust resistance
-• 5G connectivity for blazing-fast speeds`,
-  specs: [
-    { label: "Display", value: '6.4" Super AMOLED, 120Hz' },
-    { label: "Processor", value: "Exynos 1380 Octa-core" },
-    { label: "RAM", value: "8GB" },
-    { label: "Storage", value: "128GB" },
-    { label: "Battery", value: "5000mAh" },
-    { label: "Camera", value: "50MP + 12MP + 5MP" },
-  ],
-  category: "Electronics",
-};
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -65,6 +29,9 @@ const ProductDetail = () => {
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
 
+  const product = getProductById(id ?? "");
+  const seller = getSellerById(product?.sellerId);
+
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("en-KE", {
       style: "currency",
@@ -73,13 +40,38 @@ const ProductDetail = () => {
     }).format(price);
   };
 
+  // Product not found (bad/unknown id in the URL) — show a graceful empty
+  // state instead of crashing or silently displaying the wrong product.
+  if (!product) {
+    return (
+      <Layout>
+        <div className="container py-16 text-center">
+          <div className="max-w-md mx-auto">
+            <div className="h-24 w-24 mx-auto rounded-full bg-muted flex items-center justify-center mb-6">
+              <PackageSearch className="h-12 w-12 text-muted-foreground" />
+            </div>
+            <h1 className="text-2xl font-bold text-foreground mb-2">Product not found</h1>
+            <p className="text-muted-foreground mb-6">
+              We couldn't find a product with that ID. It may have been removed or the link is incorrect.
+            </p>
+            <Link to="/shop">
+              <Button variant="hero" size="lg">Back to Shop</Button>
+            </Link>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
+
+  const relatedProducts = getRelatedProducts(product);
+
   const handleAddToCart = () => {
     addToCart({
       id: product.id,
       name: product.name,
       price: product.price,
       image: product.images[0],
-      seller: product.seller.name,
+      seller: seller?.businessName ?? "SACCO-SOKO Seller",
       quantity: quantity,
     });
     toast({
@@ -95,12 +87,12 @@ const ProductDetail = () => {
       <div className="bg-muted/30 min-h-screen">
         <div className="container py-6 lg:py-8">
           {/* Breadcrumb */}
-          <nav className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
+          <nav className="flex items-center gap-2 text-sm text-muted-foreground mb-6 flex-wrap">
             <Link to="/" className="hover:text-primary">Home</Link>
             <ChevronRight className="h-4 w-4" />
             <Link to="/shop" className="hover:text-primary">Shop</Link>
             <ChevronRight className="h-4 w-4" />
-            <Link to={`/shop?category=${product.category.toLowerCase()}`} className="hover:text-primary">
+            <Link to={`/shop?category=${product.category.toLowerCase()}`} className="hover:text-primary capitalize">
               {product.category}
             </Link>
             <ChevronRight className="h-4 w-4" />
@@ -123,38 +115,42 @@ const ProductDetail = () => {
                   <Heart className="h-5 w-5" />
                 </button>
               </div>
-              
-              <div className="flex gap-3">
-                {product.images.map((image, index) => (
-                  <button
-                    key={index}
-                    className={`w-20 h-20 rounded-xl border-2 overflow-hidden transition-all ${
-                      selectedImage === index 
-                        ? "border-primary" 
-                        : "border-border hover:border-primary/50"
-                    }`}
-                    onClick={() => setSelectedImage(index)}
-                  >
-                    <img src={image} alt="" className="h-full w-full object-cover" />
-                  </button>
-                ))}
-              </div>
+
+              {product.images.length > 1 && (
+                <div className="flex gap-3">
+                  {product.images.map((image, index) => (
+                    <button
+                      key={index}
+                      className={`w-20 h-20 rounded-xl border-2 overflow-hidden transition-all ${
+                        selectedImage === index
+                          ? "border-primary"
+                          : "border-border hover:border-primary/50"
+                      }`}
+                      onClick={() => setSelectedImage(index)}
+                    >
+                      <img src={image} alt="" className="h-full w-full object-cover" />
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Details */}
             <div className="space-y-6">
               {/* Seller */}
-              <Link 
-                to={`/seller/${product.seller.name}`}
-                className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors"
-              >
-                <Store className="h-4 w-4" />
-                {product.seller.name}
-                <span className="flex items-center gap-1">
-                  <Star className="h-3 w-3 fill-primary text-primary" />
-                  {product.seller.rating}
-                </span>
-              </Link>
+              {seller && (
+                <Link
+                  to="/shop"
+                  className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors"
+                >
+                  <Store className="h-4 w-4" />
+                  {seller.businessName}
+                  <span className="flex items-center gap-1">
+                    <Star className="h-3 w-3 fill-primary text-primary" />
+                    {seller.rating}
+                  </span>
+                </Link>
+              )}
 
               <h1 className="text-2xl lg:text-3xl font-bold text-foreground">{product.name}</h1>
 
@@ -162,13 +158,13 @@ const ProductDetail = () => {
               <div className="flex items-center gap-3">
                 <div className="flex items-center gap-1">
                   {[...Array(5)].map((_, i) => (
-                    <Star 
-                      key={i} 
+                    <Star
+                      key={i}
                       className={`h-5 w-5 ${
-                        i < Math.floor(product.rating) 
-                          ? "fill-primary text-primary" 
+                        i < Math.floor(product.rating)
+                          ? "fill-primary text-primary"
                           : "text-muted"
-                      }`} 
+                      }`}
                     />
                   ))}
                 </div>
@@ -177,7 +173,7 @@ const ProductDetail = () => {
               </div>
 
               {/* Price */}
-              <div className="flex items-baseline gap-3">
+              <div className="flex items-baseline gap-3 flex-wrap">
                 <span className="text-3xl font-bold text-primary">{formatPrice(product.price)}</span>
                 <span className="text-xl text-muted-foreground line-through">{formatPrice(product.originalPrice)}</span>
                 <Badge variant="secondary" className="bg-brand-light-green text-accent-foreground">
@@ -193,7 +189,7 @@ const ProductDetail = () => {
 
               {/* Quantity & Add to Cart */}
               <div className="flex flex-col sm:flex-row gap-4">
-                <div className="flex items-center gap-3 bg-muted rounded-lg p-1">
+                <div className="flex items-center gap-3 bg-muted rounded-lg p-1 w-fit">
                   <Button
                     variant="ghost"
                     size="icon"
@@ -210,7 +206,7 @@ const ProductDetail = () => {
                     <Plus className="h-4 w-4" />
                   </Button>
                 </div>
-                
+
                 <Button variant="hero" size="lg" className="flex-1 gap-2" onClick={handleAddToCart}>
                   <ShoppingCart className="h-5 w-5" />
                   Add to Cart - {formatPrice(product.price * quantity)}
@@ -257,19 +253,51 @@ const ProductDetail = () => {
               </div>
 
               {/* Specifications */}
-              <div className="pt-6 border-t border-border">
-                <h3 className="font-semibold text-lg mb-3">Specifications</h3>
-                <div className="grid grid-cols-2 gap-3">
-                  {product.specs.map((spec, index) => (
-                    <div key={index} className="flex justify-between py-2 border-b border-border text-sm">
-                      <span className="text-muted-foreground">{spec.label}</span>
-                      <span className="font-medium text-foreground">{spec.value}</span>
-                    </div>
-                  ))}
+              {product.specs && product.specs.length > 0 && (
+                <div className="pt-6 border-t border-border">
+                  <h3 className="font-semibold text-lg mb-3">Specifications</h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {product.specs.map((spec, index) => (
+                      <div key={index} className="flex justify-between py-2 border-b border-border text-sm">
+                        <span className="text-muted-foreground">{spec.label}</span>
+                        <span className="font-medium text-foreground">{spec.value}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           </div>
+
+          {/* Related Products */}
+          {relatedProducts.length > 0 && (
+            <div className="mt-12 pt-8 border-t border-border">
+              <h2 className="text-xl lg:text-2xl font-bold text-foreground mb-6">Related Products</h2>
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-6">
+                {relatedProducts.map((related) => (
+                  <button
+                    key={related.id}
+                    onClick={() => navigate(`/product/${related.id}`)}
+                    className="group text-left bg-card rounded-2xl border border-border overflow-hidden hover:shadow-lg hover:border-primary/30 transition-all duration-300"
+                  >
+                    <div className="aspect-square overflow-hidden bg-muted">
+                      <img
+                        src={related.images[0]}
+                        alt={related.name}
+                        className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                    </div>
+                    <div className="p-3">
+                      <h3 className="font-semibold text-sm text-foreground line-clamp-2 group-hover:text-primary transition-colors min-h-[2.5rem]">
+                        {related.name}
+                      </h3>
+                      <span className="text-base font-bold text-primary">{formatPrice(related.price)}</span>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </Layout>

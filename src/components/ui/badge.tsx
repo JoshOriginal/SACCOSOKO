@@ -12,6 +12,9 @@ const badgeVariants = cva(
         secondary: "border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80",
         destructive: "border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80",
         outline: "text-foreground",
+        // Sparingly-used accent for highlights/promos (e.g. "Best Seller",
+        // "Hot Deal") so they stand out from the primary green brand color.
+        accent: "border-transparent bg-brand-orange text-white hover:bg-brand-orange/80",
       },
     },
     defaultVariants: {

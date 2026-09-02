@@ -1,15 +1,14 @@
 import { MapPin, ArrowRight, Truck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import { routes as saccoRoutes } from "@/data/routes";
 
-const routes = [
-  { from: "Nairobi CBD", to: "Kikuyu", time: "45 mins", price: "KES 150" },
-  { from: "Nairobi CBD", to: "Thika", time: "1 hour", price: "KES 200" },
-  { from: "Nairobi CBD", to: "Kitengela", time: "50 mins", price: "KES 180" },
-  { from: "Nairobi CBD", to: "Rongai", time: "40 mins", price: "KES 120" },
-  { from: "Nairobi CBD", to: "Limuru", time: "55 mins", price: "KES 170" },
-  { from: "Nairobi CBD", to: "Juja", time: "35 mins", price: "KES 100" },
-];
+const routes = saccoRoutes.map((r) => ({
+  from: r.from,
+  to: r.to,
+  time: r.estimatedTime,
+  price: `KES ${r.price}`,
+}));
 
 const DeliveryRoutes = () => {
   return (

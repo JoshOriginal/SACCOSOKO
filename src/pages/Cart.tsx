@@ -14,15 +14,6 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 
-interface CartItem {
-  id: number;
-  name: string;
-  price: number;
-  image: string;
-  seller: string;
-  quantity: number;
-}
-
 const Cart = () => {
   const { cartItems, updateQuantity, removeFromCart } = useCart();
 
