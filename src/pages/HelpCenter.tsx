@@ -198,7 +198,7 @@ const HelpCenter = () => {
             <p className="text-muted-foreground mb-6 max-w-md mx-auto">
               Can't find what you're looking for? Our support team is here to help.
             </p>
-            <Link to="/contact">
+            <Link to="/contact-us">
               <Button variant="hero" size="lg">
                 Contact Support
               </Button>

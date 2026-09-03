@@ -53,6 +53,7 @@ import SaccoRoutes from "./pages/sacco/SaccoRoutes";
 import SaccoStages from "./pages/sacco/SaccoStages";
 import SaccoDeliveries from "./pages/sacco/SaccoDeliveries";
 import SaccoProfile from "./pages/sacco/SaccoProfile";
+import SaccoBusinessValue from "./pages/sacco/SaccoBusinessValue";
 
 const queryClient = new QueryClient();
 
@@ -126,6 +127,7 @@ const App = () => (
             <Route path="/sacco/stages" element={<SaccoLayout><SaccoStages /></SaccoLayout>} />
             <Route path="/sacco/deliveries" element={<SaccoLayout><SaccoDeliveries /></SaccoLayout>} />
             <Route path="/sacco/profile" element={<SaccoLayout><SaccoProfile /></SaccoLayout>} />
+            <Route path="/sacco/business-value" element={<SaccoLayout><SaccoBusinessValue /></SaccoLayout>} />
 
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />

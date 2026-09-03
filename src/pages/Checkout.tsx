@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
@@ -26,6 +26,7 @@ import {
   CheckCircle2,
   ArrowRight,
   Info,
+  MapPin,
 } from "lucide-react";
 import { Order, OrderItem, PaymentMethod } from "@/types";
 import { buildTimeline } from "@/data/orders";
@@ -93,6 +94,19 @@ const Checkout = () => {
   const tax = Math.round(subtotal * TAX_RATE);
   const total = subtotal + DELIVERY_FEE + tax;
 
+  // There's no route/stage picker yet (a later phase) — for the demo, the
+  // delivery is auto-assigned from the first item's seller's SACCO. Shown
+  // to the customer here so checkout doesn't silently decide this, and
+  // reused unchanged when the order is actually placed below.
+  const deliveryAssignment = useMemo(() => {
+    const primarySellerId = cartItems[0]?.sellerId;
+    const primarySeller = primarySellerId ? getSellerById(primarySellerId) : undefined;
+    const sacco = primarySeller?.saccoId ? getSaccoById(primarySeller.saccoId) : undefined;
+    const route = sacco ? getRoutesBySacco(sacco.id)[0] : undefined;
+    const stage = route ? getStagesByRoute(route.id).find((s) => s.id.endsWith("-dest")) : undefined;
+    return { sacco, route, stage };
+  }, [cartItems]);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
     setFormData((prev) => ({ ...prev, [id]: value }));
@@ -121,17 +135,7 @@ const Checkout = () => {
       price: item.price,
     }));
 
-    // The checkout flow doesn't have a SACCO/route/stage picker yet (that's
-    // a later phase) — for the demo, the delivery route is auto-assigned
-    // from the first item's seller's SACCO, so the Seller Portal's
-    // "Ready for SACCO" handover screen has something real to show.
-    const primarySellerId = cartItems[0]?.sellerId;
-    const primarySeller = primarySellerId ? getSellerById(primarySellerId) : undefined;
-    const assignedSacco = primarySeller?.saccoId ? getSaccoById(primarySeller.saccoId) : undefined;
-    const assignedRoute = assignedSacco ? getRoutesBySacco(assignedSacco.id)[0] : undefined;
-    const assignedStage = assignedRoute
-      ? getStagesByRoute(assignedRoute.id).find((s) => s.id.endsWith("-dest"))
-      : undefined;
+    const { sacco: assignedSacco, route: assignedRoute, stage: assignedStage } = deliveryAssignment;
 
     const orderId = `SKO-${new Date().getFullYear()}-${Math.floor(100000 + Math.random() * 900000)}`;
     const createdAt = new Date();
@@ -199,7 +203,19 @@ const Checkout = () => {
                   <span className="text-sm text-foreground">Delivery Date:</span>
                   <span className="text-sm font-semibold text-foreground">2-3 business days</span>
                 </div>
+                {placedOrder.saccoLabel && (
+                  <div className="flex justify-between">
+                    <span className="text-sm text-foreground">Delivery via:</span>
+                    <span className="text-sm font-semibold text-foreground text-right">{placedOrder.saccoLabel}</span>
+                  </div>
+                )}
               </div>
+              <p className="text-xs text-muted-foreground mb-6 text-left bg-brand-light-green rounded-lg p-3">
+                What happens next: the seller prepares your order, hands it to{" "}
+                {placedOrder.saccoLabel ?? "our delivery partner"}, and it travels{" "}
+                {placedOrder.routeLabel ? `via ${placedOrder.routeLabel}` : "through the network"} to{" "}
+                {placedOrder.stageLabel ?? "your pickup point"} for collection.
+              </p>
               <div className="space-y-3">
                 <Button
                   onClick={() => navigate("/track-order", { state: { order: placedOrder } })}
@@ -278,6 +294,36 @@ const Checkout = () => {
                       <Input id="zipcode" placeholder="00100" className="mt-2" value={formData.zipcode} onChange={handleChange} />
                     </div>
                   </div>
+                </CardContent>
+              </Card>
+
+              {/* Delivery Method — the SACCO/route/stage this order will move through */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <MapPin className="h-5 w-5" />
+                    Delivery Method
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {deliveryAssignment.sacco ? (
+                    <div className="flex items-start gap-3 p-3 rounded-lg bg-brand-light-blue">
+                      <Truck className="h-5 w-5 text-secondary shrink-0 mt-0.5" />
+                      <div className="text-sm">
+                        <p className="font-medium text-foreground">
+                          Delivered via {deliveryAssignment.sacco.name}
+                        </p>
+                        <p className="text-muted-foreground mt-0.5">
+                          Route: {deliveryAssignment.route ? `${deliveryAssignment.route.from} → ${deliveryAssignment.route.to}` : "Not yet assigned"}
+                        </p>
+                        <p className="text-muted-foreground">
+                          Pickup at: {deliveryAssignment.stage?.name ?? "Not yet assigned"}
+                        </p>
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="text-sm text-muted-foreground">Delivery network will be assigned once your order is placed.</p>
+                  )}
                 </CardContent>
               </Card>
 

@@ -53,7 +53,7 @@ const DeliveryRoutes = () => {
         </div>
 
         <div className="text-center mt-10">
-          <Link to="/routes">
+          <Link to="/shipping-info">
             <Button variant="secondary" size="lg" className="gap-2">
               View All Routes
               <ArrowRight className="h-4 w-4" />

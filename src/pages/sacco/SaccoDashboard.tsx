@@ -59,7 +59,7 @@ const SaccoDashboard = () => {
                 <stat.icon className="h-4 w-4 text-secondary" />
               </div>
               <p className="text-xs text-muted-foreground">{stat.label}</p>
-              <p className="text-lg sm:text-xl font-bold text-foreground mt-0.5 truncate">{stat.value}</p>
+              <p className="text-base sm:text-lg lg:text-xl font-bold text-foreground mt-0.5 break-words">{stat.value}</p>
             </CardContent>
           </Card>
         ))}
@@ -160,33 +160,35 @@ const SaccoDashboard = () => {
         </CardContent>
       </Card>
 
-      {/* Business value section */}
+      {/* Business value teaser — full case lives on its own page */}
       <Card className="bg-gradient-hero-blue border-0 text-primary-foreground">
-        <CardContent className="p-6">
-          <h2 className="text-lg font-bold">Your Transport Network, Now Powering Commerce</h2>
-          <div className="flex flex-wrap items-center gap-2 mt-4 text-sm font-medium">
-            <span className="flex items-center gap-1.5 bg-primary-foreground/15 rounded-full px-3 py-1.5">
-              <Store className="h-3.5 w-3.5" /> Sellers
-            </span>
-            <ArrowRight className="h-4 w-4 opacity-70" />
-            <span className="flex items-center gap-1.5 bg-primary-foreground/15 rounded-full px-3 py-1.5">
-              <Truck className="h-3.5 w-3.5" /> SACCO Network
-            </span>
-            <ArrowRight className="h-4 w-4 opacity-70" />
-            <span className="flex items-center gap-1.5 bg-primary-foreground/15 rounded-full px-3 py-1.5">
-              <MapPin className="h-3.5 w-3.5" /> Stages
-            </span>
-            <ArrowRight className="h-4 w-4 opacity-70" />
-            <span className="flex items-center gap-1.5 bg-primary-foreground/15 rounded-full px-3 py-1.5">
-              <Users className="h-3.5 w-3.5" /> Customers
-            </span>
+        <CardContent className="p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h2 className="text-lg font-bold">Your Transport Network, Now Powering Commerce</h2>
+            <div className="flex flex-wrap items-center gap-2 mt-3 text-sm font-medium">
+              <span className="flex items-center gap-1.5 bg-primary-foreground/15 rounded-full px-3 py-1.5">
+                <Store className="h-3.5 w-3.5" /> Sellers
+              </span>
+              <ArrowRight className="h-4 w-4 opacity-70" />
+              <span className="flex items-center gap-1.5 bg-primary-foreground/15 rounded-full px-3 py-1.5">
+                <Truck className="h-3.5 w-3.5" /> SACCO Network
+              </span>
+              <ArrowRight className="h-4 w-4 opacity-70" />
+              <span className="flex items-center gap-1.5 bg-primary-foreground/15 rounded-full px-3 py-1.5">
+                <MapPin className="h-3.5 w-3.5" /> Stages
+              </span>
+              <ArrowRight className="h-4 w-4 opacity-70" />
+              <span className="flex items-center gap-1.5 bg-primary-foreground/15 rounded-full px-3 py-1.5">
+                <Users className="h-3.5 w-3.5" /> Customers
+              </span>
+            </div>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-5 text-sm">
-            <p className="opacity-90">New digital revenue channel</p>
-            <p className="opacity-90">More parcel volume</p>
-            <p className="opacity-90">Better route utilization</p>
-            <p className="opacity-90">Digital customer reach</p>
-          </div>
+          <Link to="/sacco/business-value" className="shrink-0">
+            <Button variant="hero-secondary" className="gap-2 w-full sm:w-auto">
+              View Full Business Case
+              <ArrowRight className="h-4 w-4" />
+            </Button>
+          </Link>
         </CardContent>
       </Card>
     </div>

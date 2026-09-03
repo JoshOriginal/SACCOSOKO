@@ -89,7 +89,7 @@ const SaccoDeliveries = () => {
                 <s.icon className="h-4 w-4 text-secondary" />
               </div>
               <p className="text-xs text-muted-foreground">{s.label}</p>
-              <p className="text-lg sm:text-xl font-bold text-foreground mt-0.5 truncate">{s.value}</p>
+              <p className="text-base sm:text-lg lg:text-xl font-bold text-foreground mt-0.5 break-words">{s.value}</p>
             </CardContent>
           </Card>
         ))}

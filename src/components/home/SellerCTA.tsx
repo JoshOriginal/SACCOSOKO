@@ -47,7 +47,7 @@ const SellerCTA = () => {
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
               </Link>
-              <Link to="/seller/info">
+              <Link to="/sell">
                 <Button 
                   variant="hero-outline" 
                   size="xl" 

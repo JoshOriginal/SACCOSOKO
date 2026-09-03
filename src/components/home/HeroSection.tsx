@@ -30,7 +30,7 @@ const HeroSection = () => {
             </h1>
             
             <p className="mt-4 sm:mt-6 text-base sm:text-lg text-white/90 max-w-xl mx-auto lg:mx-0 animate-slide-up leading-relaxed" style={{ animationDelay: "0.1s" }}>
-              Kenya's first e-commerce platform using SACCO-SOKO's reliable bus routes. Shop from verified sellers across the country and pick up at your nearest stage.
+              SACCO-SOKO connects online commerce with existing transport networks — shop from verified sellers and pick up at your nearest stage, using routes and stages already in operation.
             </p>
 
             <div className="flex flex-col xs:flex-row gap-3 sm:gap-4 mt-6 sm:mt-8 justify-center lg:justify-start animate-slide-up" style={{ animationDelay: "0.2s" }}>

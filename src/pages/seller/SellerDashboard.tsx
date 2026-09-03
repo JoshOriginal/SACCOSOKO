@@ -51,7 +51,7 @@ const SellerDashboard = () => {
                 <stat.icon className="h-4 w-4 text-primary" />
               </div>
               <p className="text-xs text-muted-foreground">{stat.label}</p>
-              <p className="text-lg sm:text-xl font-bold text-foreground mt-0.5 truncate">{stat.value}</p>
+              <p className="text-base sm:text-lg lg:text-xl font-bold text-foreground mt-0.5 break-words">{stat.value}</p>
             </CardContent>
           </Card>
         ))}

@@ -7,6 +7,7 @@ import {
   Route as RouteIcon,
   MapPin,
   Building2,
+  TrendingUp,
   ArrowLeft,
   Menu,
   X,
@@ -25,6 +26,7 @@ const navItems = [
   { label: "Routes", icon: RouteIcon, path: "/sacco/routes" },
   { label: "Stages", icon: MapPin, path: "/sacco/stages" },
   { label: "SACCO Profile", icon: Building2, path: "/sacco/profile" },
+  { label: "Business Value", icon: TrendingUp, path: "/sacco/business-value" },
 ];
 
 const SaccoLayout = ({ children }: SaccoLayoutProps) => {
