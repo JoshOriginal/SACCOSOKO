@@ -30,6 +30,7 @@ export default function ShopAll() {
     category: p.category.charAt(0).toUpperCase() + p.category.slice(1),
     image: p.images[0],
     seller: getSellerById(p.sellerId)?.businessName ?? "SACCO-SOKO Seller",
+    sellerId: p.sellerId,
     rating: p.rating,
   }));
 
@@ -58,6 +59,7 @@ export default function ShopAll() {
       price: product.price,
       image: product.image,
       seller: product.seller,
+      sellerId: product.sellerId,
       quantity: 1,
     });
     toast({

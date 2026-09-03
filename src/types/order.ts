@@ -1,6 +1,7 @@
 export type OrderStatus =
   | "pending"
   | "processing"
+  | "ready_for_sacco"
   | "picked-up"
   | "in-transit"
   | "at-stage"
@@ -14,6 +15,8 @@ export interface OrderItem {
   name: string;
   image: string;
   seller: string;
+  /** Links this line item back to the owning seller. Optional for backward compatibility. */
+  sellerId?: string;
   quantity: number;
   price: number;
 }
@@ -40,8 +43,19 @@ export interface Order {
   total: number;
   paymentMethod: PaymentMethod;
   status: OrderStatus;
-  /** Display-only SACCO route/stage labels. Route/stage selection at checkout is a later phase. */
+  /**
+   * SACCO/route/(destination) stage assignment. Auto-assigned for the demo
+   * (from the seller's SACCO) rather than chosen by the customer — a real
+   * route/stage picker in checkout is a later phase. The `*Label` fields are
+   * pre-resolved display strings; the `*Id` fields link back to
+   * src/data/saccos.ts, routes.ts and stages.ts for the SACCO Portal
+   * (Phase 4), which needs to filter/aggregate by id, not by name string.
+   */
+  saccoId?: string;
+  saccoLabel?: string;
+  routeId?: string;
   routeLabel?: string;
+  stageId?: string;
   stageLabel?: string;
   createdAt: string;
   timeline: OrderTimelineStep[];

@@ -72,6 +72,7 @@ const ProductDetail = () => {
       price: product.price,
       image: product.images[0],
       seller: seller?.businessName ?? "SACCO-SOKO Seller",
+      sellerId: product.sellerId,
       quantity: quantity,
     });
     toast({

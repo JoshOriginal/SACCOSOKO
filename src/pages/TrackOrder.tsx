@@ -1,33 +1,16 @@
 import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, Link } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Search,
-  Package,
-  Truck,
-  MapPin,
-  CheckCircle2,
-  Clock,
-  PackageCheck,
-} from "lucide-react";
-import { Link } from "react-router-dom";
-import { Order, OrderStatus } from "@/types";
-import { findOrder } from "@/data/orders";
-
-const STATUS_ICONS: Record<OrderStatus, typeof Package> = {
-  pending: Package,
-  processing: Clock,
-  "picked-up": Truck,
-  "in-transit": Truck,
-  "at-stage": MapPin,
-  delivered: CheckCircle2,
-  cancelled: Package,
-};
+import { Search, Package, MapPin, PackageCheck } from "lucide-react";
+import { Order } from "@/types";
+import { useOrders } from "@/hooks/useOrders";
+import { OrderTimeline } from "@/components/orders/OrderTimeline";
 
 const TrackOrder = () => {
   const location = useLocation();
+  const { getOrderById } = useOrders();
   const [trackingInput, setTrackingInput] = useState("");
   const [order, setOrder] = useState<Order | null>(null);
   const [searched, setSearched] = useState(false);
@@ -53,12 +36,10 @@ const TrackOrder = () => {
 
   const handleTrack = (e: React.FormEvent) => {
     e.preventDefault();
-    const found = findOrder(trackingInput);
+    const found = getOrderById(trackingInput);
     setOrder(found ?? null);
     setSearched(true);
   };
-
-  const currentStep = order?.timeline.filter((step) => step.completed).slice(-1)[0];
 
   return (
     <Layout>
@@ -84,7 +65,7 @@ const TrackOrder = () => {
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                   <Input
                     type="text"
-                    placeholder="Enter Order ID (e.g., SKO-2026-018823)"
+                    placeholder="Enter Order ID (e.g., SKO-2026-018001)"
                     className="pl-10 h-12 border-0 bg-transparent"
                     value={trackingInput}
                     onChange={(e) => setTrackingInput(e.target.value)}
@@ -111,64 +92,10 @@ const TrackOrder = () => {
                   </div>
                 </div>
 
-                {/* Current Status */}
-                {currentStep && (
-                  <div className="py-6 border-b border-border">
-                    <div className="flex items-center gap-4 bg-brand-light-green rounded-xl p-4">
-                      <div className="h-12 w-12 rounded-full bg-primary flex items-center justify-center animate-pulse">
-                        {(() => {
-                          const Icon = STATUS_ICONS[currentStep.status];
-                          return <Icon className="h-6 w-6 text-primary-foreground" />;
-                        })()}
-                      </div>
-                      <div>
-                        <p className="font-semibold text-foreground">{currentStep.label}</p>
-                        <p className="text-sm text-muted-foreground">{currentStep.description}</p>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Timeline */}
-                <div className="pt-6">
+                {/* Timeline (shared with the Seller Portal's order detail view) */}
+                <div className="py-6">
                   <h3 className="font-semibold text-foreground mb-6">Delivery Progress</h3>
-                  <div className="space-y-0">
-                    {order.timeline.map((step, index) => {
-                      const Icon = STATUS_ICONS[step.status];
-                      const isActive = step.status === currentStep?.status;
-                      return (
-                        <div key={step.status} className="flex gap-4">
-                          <div className="flex flex-col items-center">
-                            <div className={`h-10 w-10 rounded-full flex items-center justify-center shrink-0 ${
-                              step.completed && !isActive
-                                ? "bg-primary text-primary-foreground"
-                                : isActive
-                                ? "bg-primary text-primary-foreground animate-pulse"
-                                : "bg-muted text-muted-foreground"
-                            }`}>
-                              <Icon className="h-5 w-5" />
-                            </div>
-                            {index < order.timeline.length - 1 && (
-                              <div className={`w-0.5 h-16 ${
-                                step.completed ? "bg-primary" : "bg-border"
-                              }`} />
-                            )}
-                          </div>
-                          <div className="pb-8">
-                            <h4 className={`font-medium ${
-                              !step.completed ? "text-muted-foreground" : "text-foreground"
-                            }`}>
-                              {step.label}
-                            </h4>
-                            <p className="text-sm text-muted-foreground">{step.description}</p>
-                            {step.timestamp && (
-                              <p className="text-xs text-muted-foreground mt-1">{step.timestamp}</p>
-                            )}
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
+                  <OrderTimeline order={order} />
                 </div>
 
                 {/* Items */}
@@ -189,13 +116,16 @@ const TrackOrder = () => {
                 </div>
 
                 {/* Route Info */}
-                {(order.routeLabel || order.stageLabel) && (
+                {(order.saccoLabel || order.routeLabel || order.stageLabel) && (
                   <div className="mt-6 pt-6 flex items-center gap-3 text-sm flex-wrap">
                     <MapPin className="h-5 w-5 text-secondary shrink-0" />
+                    {order.saccoLabel && (
+                      <span className="font-medium text-foreground">{order.saccoLabel}</span>
+                    )}
                     {order.routeLabel && (
                       <>
-                        <span className="text-muted-foreground">Route:</span>
-                        <span className="font-medium text-foreground">{order.routeLabel}</span>
+                        <span className="text-muted-foreground">·</span>
+                        <span className="text-foreground">{order.routeLabel}</span>
                       </>
                     )}
                     {order.stageLabel && (

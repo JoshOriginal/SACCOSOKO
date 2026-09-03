@@ -8,6 +8,8 @@ export type { CartItem };
 
 interface CartContextType {
   cartItems: CartItem[];
+  /** True once the cart has finished reading from localStorage. Check this before treating an empty cart as real. */
+  isLoaded: boolean;
   addToCart: (item: Omit<CartItem, 'quantity'> & { quantity?: number }) => void;
   removeFromCart: (id: number) => void;
   updateQuantity: (id: number, quantity: number) => void;
@@ -84,6 +86,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const value: CartContextType = {
     cartItems,
+    isLoaded,
     addToCart,
     removeFromCart,
     updateQuantity,

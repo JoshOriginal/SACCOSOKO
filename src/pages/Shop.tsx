@@ -44,6 +44,7 @@ const allProducts = products.map((p) => ({
   originalPrice: p.originalPrice,
   image: p.images[0],
   seller: getSellerById(p.sellerId)?.businessName ?? "SACCO-SOKO Seller",
+  sellerId: p.sellerId,
   rating: p.rating,
   reviews: p.reviews,
   category: p.category,
@@ -87,6 +88,7 @@ const Shop = () => {
       price: product.price,
       image: product.image,
       seller: product.seller,
+      sellerId: product.sellerId,
       quantity: 1,
     });
     toast({

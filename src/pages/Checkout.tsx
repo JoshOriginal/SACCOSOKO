@@ -29,6 +29,11 @@ import {
 } from "lucide-react";
 import { Order, OrderItem, PaymentMethod } from "@/types";
 import { buildTimeline } from "@/data/orders";
+import { useOrders } from "@/hooks/useOrders";
+import { getSellerById } from "@/data/sellers";
+import { getSaccoById } from "@/data/saccos";
+import { getRoutesBySacco } from "@/data/routes";
+import { getStagesByRoute } from "@/data/stages";
 
 const DELIVERY_FEE = 200;
 const TAX_RATE = 0.15;
@@ -56,7 +61,8 @@ const emptyForm: DeliveryFormState = {
 const Checkout = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { cartItems, getCartTotal, clearCart } = useCart();
+  const { cartItems, isLoaded: cartLoaded, getCartTotal, clearCart } = useCart();
+  const { addOrder } = useOrders();
   const [formData, setFormData] = useState<DeliveryFormState>(emptyForm);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("mpesa");
   const [isProcessing, setIsProcessing] = useState(false);
@@ -65,12 +71,15 @@ const Checkout = () => {
 
   // If the cart is empty (and we're not just showing a completed order's
   // confirmation screen), there's nothing to check out — send the customer
-  // back to their cart instead of showing fake products.
+  // back to their cart instead of showing fake products. Wait for the cart
+  // to finish reading from localStorage first: on a direct/hard navigation
+  // to /checkout, CartContext hasn't loaded yet on the very first render,
+  // so cartItems briefly reads as [] even when the cart isn't actually empty.
   useEffect(() => {
-    if (cartItems.length === 0 && !orderComplete) {
+    if (cartLoaded && cartItems.length === 0 && !orderComplete) {
       navigate("/cart", { replace: true });
     }
-  }, [cartItems, orderComplete, navigate]);
+  }, [cartLoaded, cartItems, orderComplete, navigate]);
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("en-KE", {
@@ -107,9 +116,22 @@ const Checkout = () => {
       name: item.name,
       image: item.image,
       seller: item.seller,
+      sellerId: item.sellerId,
       quantity: item.quantity,
       price: item.price,
     }));
+
+    // The checkout flow doesn't have a SACCO/route/stage picker yet (that's
+    // a later phase) — for the demo, the delivery route is auto-assigned
+    // from the first item's seller's SACCO, so the Seller Portal's
+    // "Ready for SACCO" handover screen has something real to show.
+    const primarySellerId = cartItems[0]?.sellerId;
+    const primarySeller = primarySellerId ? getSellerById(primarySellerId) : undefined;
+    const assignedSacco = primarySeller?.saccoId ? getSaccoById(primarySeller.saccoId) : undefined;
+    const assignedRoute = assignedSacco ? getRoutesBySacco(assignedSacco.id)[0] : undefined;
+    const assignedStage = assignedRoute
+      ? getStagesByRoute(assignedRoute.id).find((s) => s.id.endsWith("-dest"))
+      : undefined;
 
     const orderId = `SKO-${new Date().getFullYear()}-${Math.floor(100000 + Math.random() * 900000)}`;
     const createdAt = new Date();
@@ -127,14 +149,22 @@ const Checkout = () => {
       total,
       paymentMethod,
       status: "pending",
+      saccoId: assignedSacco?.id,
+      saccoLabel: assignedSacco?.name,
+      routeId: assignedRoute?.id,
+      routeLabel: assignedRoute ? `${assignedRoute.from} → ${assignedRoute.to}` : undefined,
+      stageId: assignedStage?.id,
+      stageLabel: assignedStage?.name,
       createdAt: createdAt.toISOString(),
       timeline: buildTimeline("pending", createdAt),
     };
 
     // Simulated processing delay — this is a demo checkout. No payment
-    // gateway is called and the order is not persisted to a database yet.
+    // gateway is called. The order is written to the shared demo order
+    // store (OrderContext), not to Supabase.
     setTimeout(() => {
       setIsProcessing(false);
+      addOrder(newOrder);
       setPlacedOrder(newOrder);
       setOrderComplete(true);
       clearCart();
